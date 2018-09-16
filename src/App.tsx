@@ -71,7 +71,7 @@ export default class App extends React.Component<{}, IState>{
   public upload(location: string) {
 
     // The 'string' to get the weather info
-    fetch('http://api.openweathermap.org/data/2.5/weather?q=' + location + '&units=metric&APPID=3068ca5891f45fc0b650fa2ab42e2d22', {
+    fetch('https://api.openweathermap.org/data/2.5/weather?q=' + location + '&units=metric&APPID=3068ca5891f45fc0b650fa2ab42e2d22', {
       method: 'POST',
       headers: {
         'Content-Type': 'text/plain',
