@@ -8,6 +8,7 @@ import logo from './icon.png';
 
 interface IState {
   // fields private to the class
+  enter: any,
   input: any,
   date: string,
   condition: string,
@@ -26,8 +27,9 @@ export default class App extends React.Component<{}, IState>{
       condition: "",
       date: "",
       description: "",
-      input: "",
-      location: this.userData.bind(this),
+      enter: this.button.bind(this),
+      input: this.userData.bind(this),
+      location: "",
       temperature: ""
     }
 
@@ -36,7 +38,6 @@ export default class App extends React.Component<{}, IState>{
 
   public userData(prefPlace: any) {
 
-    // Set the variables up
     this.setState({
       location: prefPlace.value,
     })
@@ -44,8 +45,22 @@ export default class App extends React.Component<{}, IState>{
   }
 
 
-  public upload(location: string) {
+  public button(prefPlace: any) {
 
+    this.setState({
+      condition: "",
+      date: "",
+      description: "",
+      location: "",
+      temperature: ""
+    })
+
+    this.upload(this.state.location)
+
+  }
+
+
+  public upload(location: string) {
 
     location = "Chicago"
 
@@ -59,7 +74,7 @@ export default class App extends React.Component<{}, IState>{
       // The response from there server turned into text then displayed
 
       .then((response: any) => {
-        if (response.query.results === null) {
+        if (response.query.results.title === null) {
 
           this.setState({
 
@@ -94,8 +109,7 @@ export default class App extends React.Component<{}, IState>{
           <h1 className="title">Weather Today</h1>
         </header>
         <p className="intro">
-          Enter Country or City here for weather conditions: {this.state.temperature} {this.state.date} {this.state.condition} {this.state.description}
-          {this.state.location}
+          Enter Country or City here for weather conditions:
         </p>
 
         <div className="field">
@@ -112,10 +126,17 @@ export default class App extends React.Component<{}, IState>{
 
 
         <div className="button" style={{ padding: '10px' }}>
-          <Button variant="contained" className={"button"}>
+          <Button variant="contained" className={"button"}
+            onClick={this.state.enter}>
             Enter
         </Button>
         </div>
+
+
+         <p className="intro">
+          {this.state.temperature} {this.state.date} {this.state.condition} {this.state.description}
+          {this.state.location}
+        </p>
 
 
       </div>
