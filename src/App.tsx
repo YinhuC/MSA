@@ -1,4 +1,5 @@
 import Button from '@material-ui/core/Button';
+import CircularProgress from '@material-ui/core/CircularProgress';
 import Input from '@material-ui/core/Input';
 import * as React from 'react';
 import './App.css';
@@ -8,9 +9,9 @@ import logo from './icon.png';
 
 interface IState {
   // fields private to the class
+  fail:boolean,
   enter: any,
   input: any,
-  date: string,
   condition: string,
   location: string,
   temperature: string,
@@ -25,9 +26,9 @@ export default class App extends React.Component<{}, IState>{
     super(props)
     this.state = {
       condition: "",
-      date: "",
       description: "",
       enter: this.button.bind(this),
+      fail: true,
       input: this.userData.bind(this),
       location: "",
       temperature: ""
@@ -49,8 +50,8 @@ export default class App extends React.Component<{}, IState>{
 
     this.setState({
       condition: "",
-      date: "",
       description: "",
+      fail:true,
       location: "",
       temperature: ""
     })
@@ -65,40 +66,29 @@ export default class App extends React.Component<{}, IState>{
     location = "Chicago"
 
     // The 'string' to get the weather info
-    fetch('https://query.yahooapis.com/v1/public/yql?q=select * from weather.forecast where woeid in'
-      + '(select woeid from geo.places(1) where text="' + location + '")&format=json', {
-        method: 'POST'
-      })
-
-
-      // The response from there server turned into text then displayed
-
+    fetch('http://api.openweathermap.org/data/2.5/weather?q=' + location + '&units=metric&APPID=3068ca5891f45fc0b650fa2ab42e2d22', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'text/plain',
+      },
+    })
       .then((response: any) => {
-        if (response.query.results.title === null) {
-
-          this.setState({
-
-            condition: "FAIL"
-
-          })
-
+        if (!response.ok) {
+          this.setState({ condition: "No city found named: " + location, fail:true })
         }
         else {
-
-          this.setState({
-
-            condition: response.query.results.channel.item.condition.text,
-            date: response.query.results.channel.item.condition.date,
-            description: response.query.results.channel.item.description,
-            temperature: response.query.results.channel.item.condition.temp
-
-          })
-
+          response.json().then((data: any) => this.setState({
+            fail:false,
+            condition: data.weather[0].main,
+            temperature: data.main.temp,
+            description: data.weather[3],
+          }))
+          console.log(this.state.condition)
         }
+        return response
       })
 
   }
-
 
 
   public render() {
@@ -133,10 +123,22 @@ export default class App extends React.Component<{}, IState>{
         </div>
 
 
-         <p className="intro">
-          {this.state.temperature} {this.state.date} {this.state.condition} {this.state.description}
-          {this.state.location}
-        </p>
+       <div className="results1">
+          {
+            this.state.fail === true && this.state.location !== "" ?
+              <CircularProgress /> :
+              <p> {this.state.condition}</p>
+          }
+        </div>
+
+        <div className="results">
+          {
+            this.state.fail === false && this.state.location !== "" ?
+              <CircularProgress /> :
+              <p> {this.state.temperature} {this.state.condition} {this.state.description}
+                {this.state.location}YOOOOOO</p>
+          }
+        </div>
 
 
       </div>
