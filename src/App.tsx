@@ -1,3 +1,4 @@
+import Button from '@material-ui/core/Button';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Input from '@material-ui/core/Input';
 import * as React from 'react';
@@ -32,19 +33,15 @@ export default class App extends React.Component<{}, IState>{
   }
 
 
-  public userData(prefPlace: string, evt: KeyboardEvent) {
+  public userData(prefPlace: string) {
 
-    if (evt.which === 13) {
+    // Set the variables up
+    this.setState({
+      location: prefPlace,
 
-      // Set the variables up
-      this.setState({
-        location: prefPlace,
+    })
 
-      })
-
-      this.upload(prefPlace)
-
-    }
+    this.upload(prefPlace)
 
   }
 
@@ -103,19 +100,24 @@ export default class App extends React.Component<{}, IState>{
           {this.state.location}
         </p>
 
-        <Input
-          placeholder="Country/City"
-          className={"textField"}
-          inputProps={{
-            'aria-label': 'Description',
-          }}
+        <div className="field">
+          <Input
+            value={this.state.location}
+            placeholder="Country/City"
+            className={"textField"}
+            inputProps={{
+              'aria-label': 'Description',
+            }}
+          />
+        </div>
 
-        />
+        <div className="button" style={{padding: '10px'}}>
+          <Button variant="contained" className={"button"}>
+            Enter
+        </Button>
+        </div>
 
-
-
-
-        <div className="dank">
+        <div className="load">
           {
             this.state.condition !== "" && this.state.location.length > 0 ?
               <CircularProgress /> :
