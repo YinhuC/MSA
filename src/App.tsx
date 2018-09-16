@@ -1,5 +1,4 @@
 import Button from '@material-ui/core/Button';
-import CircularProgress from '@material-ui/core/CircularProgress';
 import Input from '@material-ui/core/Input';
 import * as React from 'react';
 import './App.css';
@@ -9,6 +8,7 @@ import logo from './icon.png';
 
 interface IState {
   // fields private to the class
+  input: any,
   date: string,
   condition: string,
   location: string,
@@ -26,6 +26,7 @@ export default class App extends React.Component<{}, IState>{
       condition: "",
       date: "",
       description: "",
+      input: "",
       location: this.userData.bind(this),
       temperature: ""
     }
@@ -33,15 +34,12 @@ export default class App extends React.Component<{}, IState>{
   }
 
 
-  public userData(prefPlace: string) {
+  public userData(prefPlace: any) {
 
     // Set the variables up
     this.setState({
-      location: prefPlace,
-
+      location: prefPlace.value,
     })
-
-    this.upload(prefPlace)
 
   }
 
@@ -102,29 +100,22 @@ export default class App extends React.Component<{}, IState>{
 
         <div className="field">
           <Input
-            value={this.state.location}
             placeholder="Country/City"
             className={"textField"}
             inputProps={{
               'aria-label': 'Description',
             }}
+            onChange={this.state.input}
+            value={this.state.location}
           />
         </div>
 
-        <div className="button" style={{padding: '10px'}}>
+
+        <div className="button" style={{ padding: '10px' }}>
           <Button variant="contained" className={"button"}>
             Enter
         </Button>
         </div>
-
-        <div className="load">
-          {
-            this.state.condition !== "" && this.state.location.length > 0 ?
-              <CircularProgress /> :
-              <p> WETHEAR INFO </p>
-          }
-        </div>
-
 
 
       </div>
