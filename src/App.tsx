@@ -1,5 +1,8 @@
+import CircularProgress from '@material-ui/core/CircularProgress';
+import Input from '@material-ui/core/Input';
 import * as React from 'react';
 import './App.css';
+
 
 import logo from './icon.png';
 
@@ -13,6 +16,7 @@ interface IState {
 }
 
 
+
 export default class App extends React.Component<{}, IState>{
 
   constructor(props: any) {
@@ -24,18 +28,23 @@ export default class App extends React.Component<{}, IState>{
       location: this.userData.bind(this),
       temperature: ""
     }
+
   }
 
 
-  public userData(prefPlace: string) {
+  public userData(prefPlace: string, evt: KeyboardEvent) {
 
-    // Set the variables up
-    this.setState({
-      location: "prefPlace",
-    })
+    if (evt.which === 13) {
 
-    // Call next method
-    this.upload(prefPlace)
+      // Set the variables up
+      this.setState({
+        location: prefPlace,
+
+      })
+
+      this.upload(prefPlace)
+
+    }
 
   }
 
@@ -43,41 +52,79 @@ export default class App extends React.Component<{}, IState>{
   public upload(location: string) {
 
 
+    location = "Chicago"
+
     // The 'string' to get the weather info
     fetch('https://query.yahooapis.com/v1/public/yql?q=select * from weather.forecast where woeid in'
-    + '(select woeid from geo.places(1) where text="' + 'Chicago' + '")&format=json', {
-      method: 'POST'
-    })
+      + '(select woeid from geo.places(1) where text="' + location + '")&format=json', {
+        method: 'POST'
+      })
 
-     // The response from there server turned into text then displayed
 
-    .then((response : any) => {
-      if (response.query.results === null) {
+      // The response from there server turned into text then displayed
 
-        // SEND ERROR MESSAGE
+      .then((response: any) => {
+        if (response.query.results === null) {
 
-      }
-      else {
+          this.setState({
 
-        let AAA:string = "lol"
+            condition: "FAIL"
 
-        
-      }
-    })
+          })
+
+        }
+        else {
+
+          this.setState({
+
+            condition: response.query.results.channel.item.condition.text,
+            date: response.query.results.channel.item.condition.date,
+            description: response.query.results.channel.item.description,
+            temperature: response.query.results.channel.item.condition.temp
+
+          })
+
+        }
+      })
 
   }
+
 
 
   public render() {
     return (
       <div className="App">
         <header className="header">
-          <img src={logo} className="icon"/>
+          <img src={logo} className="icon" />
           <h1 className="title">Weather Today</h1>
         </header>
         <p className="intro">
-          TEXT ENBTRSDFE HERE
+          Enter Country or City here for weather conditions: {this.state.temperature} {this.state.date} {this.state.condition} {this.state.description}
+          {this.state.location}
         </p>
+
+        <Input
+          placeholder="Country/City"
+          className={"textField"}
+          inputProps={{
+            'aria-label': 'Description',
+          }}
+
+        />
+
+
+
+
+        <div className="dank">
+          {
+            this.state.condition !== "" && this.state.location.length > 0 ?
+              <CircularProgress /> :
+              <p> WETHEAR INFO </p>
+          }
+        </div>
+
+
+
       </div>
     );
   }
