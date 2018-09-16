@@ -9,13 +9,17 @@ import logo from './icon.png';
 
 interface IState {
   // fields private to the class
-  fail:boolean,
+  fail: boolean,
   enter: any,
-  input: any,
+  input: string,
   condition: string,
   location: string,
   temperature: string,
-  description: string
+  description: string,
+  wind: string,
+  temperatureN:string,
+  temperatureX: string,
+  humid: string
 }
 
 
@@ -29,18 +33,21 @@ export default class App extends React.Component<{}, IState>{
       description: "",
       enter: this.button.bind(this),
       fail: true,
+      humid: "",
       input: this.userData.bind(this),
       location: "",
-      temperature: ""
+      temperature: "",
+      temperatureN:"",
+      temperatureX: "",
+      wind: ""
     }
 
   }
 
 
-  public userData(prefPlace: any) {
-
+  public userData = (event: any) => {
     this.setState({
-      location: prefPlace.value,
+      input: event.target.value,
     })
 
   }
@@ -51,19 +58,17 @@ export default class App extends React.Component<{}, IState>{
     this.setState({
       condition: "",
       description: "",
-      fail:true,
+      fail: true,
       location: "",
       temperature: ""
     })
 
-    this.upload(this.state.location)
+    this.upload(this.state.input)
 
   }
 
 
   public upload(location: string) {
-
-    location = "Chicago"
 
     // The 'string' to get the weather info
     fetch('http://api.openweathermap.org/data/2.5/weather?q=' + location + '&units=metric&APPID=3068ca5891f45fc0b650fa2ab42e2d22', {
@@ -74,16 +79,19 @@ export default class App extends React.Component<{}, IState>{
     })
       .then((response: any) => {
         if (!response.ok) {
-          this.setState({ condition: "No city found named: " + location, fail:true })
+          this.setState({ description: 'No city found named: ' + location, fail: true })
         }
         else {
           response.json().then((data: any) => this.setState({
-            fail:false,
+            fail: false,
             condition: data.weather[0].main,
             temperature: data.main.temp,
-            description: data.weather[3],
+            temperatureN: data.main.temp_min,
+            temperatureX: data.main.temp_max,
+            description: data.weather[0].description,
+            wind: data.wind.speed,
+            humid: data.main.humidity,
           }))
-          console.log(this.state.condition)
         }
         return response
       })
@@ -109,8 +117,8 @@ export default class App extends React.Component<{}, IState>{
             inputProps={{
               'aria-label': 'Description',
             }}
-            onChange={this.state.input}
-            value={this.state.location}
+            value={this.state.input}
+            onChange={this.userData}
           />
         </div>
 
@@ -123,20 +131,21 @@ export default class App extends React.Component<{}, IState>{
         </div>
 
 
-       <div className="results1">
-          {
-            this.state.fail === true && this.state.location !== "" ?
-              <CircularProgress /> :
-              <p> {this.state.condition}</p>
-          }
-        </div>
+
 
         <div className="results">
           {
             this.state.fail === false && this.state.location !== "" ?
               <CircularProgress /> :
-              <p> {this.state.temperature} {this.state.condition} {this.state.description}
-                {this.state.location}YOOOOOO</p>
+              <p> Location: {this.state.input} <br /> <br />
+                Wind Speed: {this.state.wind} km/hour <br /> <br />
+                Temperature: {this.state.temperature}℃ <br />
+                Low: {this.state.temperatureN}℃ <br />
+                High: {this.state.temperatureX}℃ <br /> <br />
+                Humidity: {this.state.humid}%  <br />
+                Condition: {this.state.condition} <br />
+                Description: {this.state.description} <br />
+              </p>
           }
         </div>
 
